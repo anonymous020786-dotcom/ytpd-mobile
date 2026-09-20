@@ -1,0 +1,26 @@
+node_modules/
+
+# Android build outputs (keep the native project source itself - Capacitor
+# apps commit android/ and ios/, unlike a typical "generated" folder)
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/captures/
+android/*.iml
+android/.idea/
+
+# iOS build outputs
+ios/App/build/
+ios/App/Pods/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
+ios/DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Build artifacts if built locally
+*.apk
+*.aab

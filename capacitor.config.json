@@ -1,0 +1,9 @@
+{
+  "appId": "com.playlistgrabber.app",
+  "appName": "Playlist Grabber",
+  "webDir": "www",
+  "server": {
+    "url": "https://your-domain-here.example.com",
+    "cleartext": false
+  }
+}
