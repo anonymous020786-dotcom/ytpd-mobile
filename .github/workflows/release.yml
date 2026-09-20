@@ -1,0 +1,102 @@
+name: Release mobile builds
+
+# Android: builds a real, installable debug APK (unsigned - fine for
+# sideloading/testing, not for Play Store) and publishes it to this repo's
+# Releases.
+#
+# iOS: there's no Apple Developer Program membership set up yet, so this
+# CANNOT produce an installable .ipa (that needs a paid account + signing
+# certificate/provisioning profile, both requiring the repo owner's own
+# Apple ID - see README). What it CAN do, and does, is build the Xcode
+# project for the iOS Simulator with signing disabled, which proves the
+# native project and web app URL are actually wired up correctly. No
+# artifact comes out of this job - it's a correctness check, not a release.
+#
+# Triggers on pushing a tag like v1.2.3, or manually via Actions tab.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync Capacitor (bakes in YTPD_HOSTED_URL)
+        env:
+          YTPD_HOSTED_URL: ${{ vars.YTPD_HOSTED_URL }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const cfg = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf-8'));
+            if (process.env.YTPD_HOSTED_URL) cfg.server.url = process.env.YTPD_HOSTED_URL;
+            fs.writeFileSync('capacitor.config.json', JSON.stringify(cfg, null, 2));
+          "
+          npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" --title "Playlist Grabber ${{ github.ref_name }}" --notes "Android debug build. Unsigned - not from Play Store, sideload it directly." --repo ${{ github.repository }} || true
+          gh release upload "${{ github.ref_name }}" android/app/build/outputs/apk/debug/app-debug.apk --repo ${{ github.repository }} --clobber
+
+  ios-build-check:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync Capacitor (bakes in YTPD_HOSTED_URL)
+        env:
+          YTPD_HOSTED_URL: ${{ vars.YTPD_HOSTED_URL }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const cfg = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf-8'));
+            if (process.env.YTPD_HOSTED_URL) cfg.server.url = process.env.YTPD_HOSTED_URL;
+            fs.writeFileSync('capacitor.config.json', JSON.stringify(cfg, null, 2));
+          "
+          npx cap sync ios
+
+      - name: Build for Simulator (no signing - correctness check only)
+        working-directory: ios/App
+        run: |
+          xcodebuild build \
+            -project App.xcodeproj \
+            -scheme App \
+            -destination "generic/platform=iOS Simulator" \
+            CODE_SIGNING_ALLOWED=NO
