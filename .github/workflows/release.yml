@@ -35,11 +35,14 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest ships with the Android SDK preinstalled (ANDROID_HOME
+      # already set) - android-actions/setup-android@v3 was tried here and
+      # failed trying to install the long-removed legacy 'tools' package.
+      # Not needed at all.
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Install dependencies
         run: npm ci
@@ -75,7 +78,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Install dependencies
         run: npm ci
