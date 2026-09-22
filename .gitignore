@@ -24,3 +24,7 @@ ios/DerivedData/
 # Build artifacts if built locally
 *.apk
 *.aab
+
+# local machine's MCP server config (references a local AWS profile name,
+# not committed since other clones/machines will have their own)
+/.mcp.json

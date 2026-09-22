@@ -3,7 +3,7 @@
   "appName": "Playlist Grabber",
   "webDir": "www",
   "server": {
-    "url": "https://your-domain-here.example.com",
+    "url": "https://ytpd.videodownloaders.cloud",
     "cleartext": false
   }
 }
