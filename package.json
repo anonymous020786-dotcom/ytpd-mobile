@@ -1,7 +1,7 @@
 {
   "name": "ytpd-mobile",
   "productName": "Playlist Grabber",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Native Android/iOS wrapper for Playlist Grabber - points at the hosted ytpd-web frontend",
   "private": true,
   "scripts": {

@@ -2,12 +2,13 @@
 
 Android and iOS wrapper for Playlist Grabber, built with [Capacitor](https://capacitorjs.com/). Unlike the [desktop build](https://github.com/anonymous020786-dotcom/ytpd-desktop), this is **not** a local sidecar app — neither Android nor iOS allows an app to spawn arbitrary native executables the way Electron does on desktop. Instead, this is a thin native shell: Capacitor's WebView loads the **hosted** [ytpd-web](https://github.com/anonymous020786-dotcom/ytpd-web) frontend directly, same as opening it in a mobile browser, just packaged as an installable app with a real icon, splash screen, and app-store presence.
 
-**This means the app does nothing useful until `ytpd-web` is actually deployed somewhere reachable.** `capacitor.config.json`'s `server.url` is currently a placeholder (`https://your-domain-here.example.com`).
+`capacitor.config.json`'s `server.url` points at the live hosted site, `https://ytpd.videodownloaders.cloud`.
+
+**Sign-in:** the app has no username/password login of its own (removed from `ytpd-web` on every platform). The only gate is the hosted site's Cloudflare Access page — an email one-time code on first launch, which the WebView handles like any browser.
 
 ## Status
 
 - Android and iOS projects are scaffolded, icon/splash assets generated, CI wired up.
-- **Blocked on:** a live hosted deployment of `ytpd-web` (in progress separately — needs a fresh AWS account + Supabase Postgres project, both requiring the repo owner's own signup).
 - **Blocked on, for real store distribution:** an Apple Developer Program membership ($99/yr) and a Google Play Console account ($25 one-time) — both need the repo owner's own identity/payment directly with Apple/Google. Nothing here can substitute for that.
 
 ## Setting the hosted URL
